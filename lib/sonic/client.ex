@@ -40,7 +40,7 @@ defmodule Sonic.Client do
     method = :get
     path = "/v2/keys/" <> Enum.map_join(key, "/", &URI.encode/1)
     if opts[:recursive] == true do
-      path = path <> "&recursive=true"
+      path = path <> "/&recursive=true"
     end
     headers = []
     body = <<>>
