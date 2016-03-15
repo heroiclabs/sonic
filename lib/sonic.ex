@@ -10,13 +10,6 @@ defmodule Sonic do
     import Supervisor.Spec, warn: false
 
     children = [
-      worker(Sonic.Client, [
-        [
-          pool_name: Application.get_env(:sonic, :client)[:pool_name],
-          host: Application.get_env(:sonic, :host),
-          port: Application.get_env(:sonic, :client)[:port]
-        ]
-      ]),
       :hackney_pool.child_spec(Application.get_env(:sonic, :client)[:pool_name], [
         timeout: Application.get_env(:sonic, :client)[:timeout],
         max_connections: Application.get_env(:sonic, :client)[:max_connections]
@@ -25,9 +18,7 @@ defmodule Sonic do
 
     # Set options and start supervisor.
     opts = [strategy: :one_for_one, name: Sonic.Supervisor]
-    sup = Supervisor.start_link(children, opts)
-
-    sup
+    Supervisor.start_link(children, opts)
   end
 
 end
