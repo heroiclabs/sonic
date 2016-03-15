@@ -1,6 +1,5 @@
 defmodule Sonic do
   use Application
-  require Logger
 
   @moduledoc """
   etcd library and bindings for Elixir.
