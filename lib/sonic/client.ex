@@ -1,9 +1,25 @@
 defmodule Sonic.Client do
 
-  #
-  # Client API functions.
-  #
+  @moduledoc """
+  Client API functions.
+  """
 
+  @doc """
+  Get a Key-Value pair and corresponding headers.
+
+  ## Examples
+
+  ```elixir
+  > Sonic.Client.kv_get("test_key")
+  {:ok, 200,
+   [{"Content-Type", "application/json"},
+    {"X-Etcd-Cluster-Id", "7e27652122e8b2ae"}, {"X-Etcd-Index", "5"},
+    {"X-Raft-Index", "313719"}, {"X-Raft-Term", "2"},
+    {"Date", "Mon, 14 Mar 2016 10:34:02 GMT"}, {"Content-Length", "90"}],
+   "{\"action\":\"get\",\"node\":{\"key\":\"/test_key\",\"value\":\"test_value\",\"modifiedIndex\":5,\"createdIndex\":5}}\n"}
+  ```
+
+  """
   def kv_get(key, opts \\ [])
   def kv_get(key, opts) when is_binary(key) do
     kv_get([key], opts)
@@ -16,6 +32,28 @@ defmodule Sonic.Client do
     request(method, path, headers, body)
   end
 
+  @doc """
+  Set the value of a Key-Value pair.
+
+  Allowed options:
+  * `ttl` - The key TTL in seconds.
+
+  ## Examples
+
+  ```elixir
+  > Sonic.Client.kv_put("test_key", "test_value", ttl: 15)
+  {:ok, 201,
+   [{"Content-Type", "application/json"},
+    {"X-Etcd-Cluster-Id", "7e27652122e8b2ae"}, {"X-Etcd-Index", "25792"},
+    {"X-Raft-Index", "814223"}, {"X-Raft-Term", "3"},
+    {"Date", "Fri, 18 Mar 2016 15:20:44 GMT"}, {"Content-Length", "162"}],
+   %{"action" => "set",
+     "node" => %{"createdIndex" => 25792,
+       "expiration" => "2016-03-18T15:20:59.30566372Z", "key" => "/test_key",
+       "modifiedIndex" => 25792, "ttl" => 15, "value" => "test_value"}}}
+  ```
+
+  """
   def kv_put(key, value, opts \\ [])
   def kv_put(key, value, opts) when is_binary(key) do
     kv_put([key], value, opts)
@@ -32,6 +70,31 @@ defmodule Sonic.Client do
     request(method, path, headers, body)
   end
 
+  @doc """
+  Perform a directory listing.
+
+  Allowed options:
+  * `recursive` - `true`/`false` indicates whether to recurse into any child directories. Default `false`.
+
+  ## Examples
+
+  ```elixir
+  > Sonic.Client.dir_list("test_dir")                                   
+  {:ok, 200,
+   [{"Content-Type", "application/json"},
+    {"X-Etcd-Cluster-Id", "7e27652122e8b2ae"}, {"X-Etcd-Index", "25794"},
+    {"X-Raft-Index", "814446"}, {"X-Raft-Term", "3"},
+    {"Date", "Fri, 18 Mar 2016 15:22:35 GMT"}, {"Content-Length", "256"}],
+   %{"action" => "get",
+     "node" => %{"createdIndex" => 25794, "dir" => true, "key" => "/test_dir",
+       "modifiedIndex" => 25794,
+       "nodes" => [%{"createdIndex" => 25794,
+          "expiration" => "2016-03-18T15:22:48.953852633Z",
+          "key" => "/test_dir/test_key", "modifiedIndex" => 25794, "ttl" => 14,
+          "value" => "test_value"}]}}}
+  ```
+
+  """
   def dir_list(key, opts \\ [])
   def dir_list(key, opts) when is_binary(key) do
     dir_list([key], opts)
